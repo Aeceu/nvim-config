@@ -1,3 +1,4 @@
+local bufferline = require("bufferline")
 return {
   {
     "akinsho/bufferline.nvim",
@@ -16,10 +17,12 @@ return {
     },
     opts = {
       options = {
-      -- stylua: ignore
-      close_command = function(n) Snacks.bufdelete(n) end,
-      -- stylua: ignore
-      right_mouse_command = function(n) Snacks.bufdelete(n) end,
+        mode = "buffers",
+        style_preset = bufferline.style_preset.minimal,
+    -- stylua: ignore
+    close_command = function(n) Snacks.bufdelete(n) end,
+    -- stylua: ignore
+    right_mouse_command = function(n) Snacks.bufdelete(n) end,
         diagnostics = "nvim_lsp",
         always_show_bufferline = false,
         diagnostics_indicator = function(_, _, diag)
@@ -31,7 +34,7 @@ return {
         offsets = {
           {
             filetype = "neo-tree",
-            text = "Neo-tree",
+            text = "File Explorer",
             highlight = "Directory",
             text_align = "left",
           },
@@ -39,6 +42,7 @@ return {
             filetype = "snacks_layout_box",
           },
         },
+        separator_style = "thin",
         ---@param opts bufferline.IconFetcherOpts
         get_element_icon = function(opts)
           return LazyVim.config.icons.ft[opts.filetype]
@@ -47,6 +51,7 @@ return {
     },
     config = function(_, opts)
       require("bufferline").setup(opts)
+
       -- Fix bufferline when restoring a session
       vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
         callback = function()
@@ -55,6 +60,32 @@ return {
           end)
         end,
       })
+
+      -- Highlight overrides to remove bufferline background
+      local transparent_groups = {
+        "BufferLineFill",
+        "BufferLineBackground",
+        "BufferLineTab",
+        "BufferLineTabSelected",
+        "BufferLineTabClose",
+        "BufferLineSeparator",
+        "BufferLineSeparatorSelected",
+        "BufferLineSeparatorVisible",
+        "BufferLineCloseButton",
+        "BufferLineCloseButtonSelected",
+        "BufferLineCloseButtonVisible",
+        "BufferLineModified",
+        "BufferLineModifiedVisible",
+        "BufferLineModifiedSelected",
+        "BufferLineOffsetSeparator", -- this one often causes a bar to appear
+      }
+
+      for _, group in ipairs(transparent_groups) do
+        vim.api.nvim_set_hl(0, group, { bg = "NONE" })
+      end
+      vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
+      vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
+      vim.api.nvim_set_hl(0, "BufferLineFill", { link = "Normal" })
     end,
   },
 }
