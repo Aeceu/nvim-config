@@ -21,3 +21,7 @@ vim.api.nvim_set_keymap("n", "<leader>zp", ":lua RemoveKittyPadding()<CR>", { no
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = RemoveKittyPadding,
 })
+
+vim.cmd([[
+  highlight VertSplit guifg=#ff8800 guibg=NONE
+]])
